@@ -1,7 +1,4 @@
 # python-todo
-Frontend:
-        HTML/CSS
-Backend:
-        Flask
-Database:
-        SQLite
+Frontend:HTML/CSS<br>
+Backend:Flask<br>
+Database:SQLite
