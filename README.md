@@ -1,4 +1,4 @@
 # python-todo
-Frontend:HTML/CSS<br>
-Backend:Flask<br>
+Frontend:HTML/CSS/Javascript<br>
+Backend:FastAPI<br>
 Database:SQLite
