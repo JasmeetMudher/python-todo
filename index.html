@@ -1,21 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todo App</title>
-    <link rel="stylesheet" href="/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
     <div class="container">
-        <h1>My Todo List</h1>
-        <input placeholder="Enter a Task" id = "task">
-        <button onclick="addTask()">Add</button>
+      <header class="app-header">
+        <h1>My Todo App</h1>
+      </header>
+
+      <section class="input-section">
+        <input placeholder="Enter a Task" id="task" />
+
+        <p>Select Priority</p>
+        <select>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <p>Select Task type:</p>
+        <select>
+          <option>Personal</option>
+          <option>School</option>
+          <option>Work</option></select
+        ><br />
+
+        <p>Select Deadline:</p>
+        <input type="date" />
+
+        <button>Add</button>
+      </section>
+
+      <section class="list-section">
         <ul id="list"></ul>
-        <button onclick="clearAll()">Clear All</button>
+        <p>Your Tasks:</p><br>
+        <ol id="list">
+          <li>Example task 1</li>
+          <li>Example task 2</li>
+          <br>
+        </ol>
+      </section>
 
+      <button class="clear-btn">Clear All</button>
+
+      <footer>
+        <p>My Todo App</p>
+      </footer>
     </div>
-<script src="script.js"></script>
 
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
