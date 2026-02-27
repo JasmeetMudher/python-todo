@@ -16,39 +16,35 @@
         <input placeholder="Enter a Task" id="task" />
 
         <p>Select Priority</p>
-        <select>
+        <select id="priority">
           <option>Low</option>
           <option>Medium</option>
           <option>High</option>
         </select>
 
         <p>Select Task type:</p>
-        <select>
+        <select id="task-type">
           <option>Personal</option>
           <option>School</option>
           <option>Work</option></select
         ><br />
 
         <p>Select Deadline:</p>
-        <input type="date" />
+        <input type="date" id="deadline" />
 
-        <button>Add</button>
+        <button id="add-btn">Add</button>
       </section>
 
       <section class="list-section">
-        <ul id="list"></ul>
-        <p>Your Tasks:</p><br>
-        <ol id="list">
-          <li>Example task 1</li>
-          <li>Example task 2</li>
-          <br>
-        </ol>
+        <p>Your Tasks:</p>
+        <ol id="task-list"></ol>
+        <br />
       </section>
 
-      <button class="clear-btn">Clear All</button>
+      <button id="clear-btn" class="clear-btn">Clear All</button>
 
       <footer>
-        <p>My Todo App</p>
+        <p>Made by Jasmeet</p>
       </footer>
     </div>
 
