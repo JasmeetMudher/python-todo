@@ -1,42 +1,38 @@
 const addBtn = document.getElementById("add-btn");
-const clearAll = document.getElementById("clear-btn");
-const taskList = document.getElementById("task-list");
-const deadline = document.getElementById("deadline");
-const priority = document.getElementById("priority");
-const taskType = document.getElementById("task-type");
+const clearAllBtn = document.getElementById("clear-btn");
+const taskListOl = document.getElementById("task-list");
+const deadlineInput = document.getElementById("deadline");
+const prioritySelect = document.getElementById("priority");
+const taskTypeSelect = document.getElementById("task-type");
 const taskInput = document.getElementById("task");
 
 function addTask() {
   let taskValue = taskInput.value.trim();
-  let deadlineValue = deadline.value;
-  let priorityValue = priority.value;
-  let taskTypeValue = taskType.value;
+  let deadlineValue = deadlineInput.value;
+  let priorityValue = prioritySelect.value;
+  let taskTypeValue = taskTypeSelect.value;
 
   if (taskValue === "") {
     alert("Please Enter a Task");
     return;
   }
-  if (deadlineValue === "") {
-    alert("Please Enter Deadline");
-    return;
-  }
 
-  let newList = document.createElement("li");
+  let li = document.createElement("li");
 
-  newList.innerHTML = `Task: ${taskValue},<br/>
-                        Priority: ${priorityValue},<br/>
-                        Task Type: ${taskTypeValue},<br/>
-                        Deadline: ${deadlineValue}`;
+  li.innerText =`Task: ${taskValue}\n` +
+                `Priority: ${priorityValue}\n` +
+                `Task Type: ${taskTypeValue}\n` +
+                `Deadline: ${deadlineValue || "No deadline"}`;
 
-  taskList.appendChild(newList);
+  taskListOl.appendChild(li);
 
   taskInput.value = "";
-  deadline.value = "";
+  deadlineInput.value = "";
 }
 
 function clearTasks() {
-  taskList.innerHTML = "";
+  taskListOl.innerHTML = "";
 }
 
 addBtn.addEventListener("click", addTask);
-clearAll.addEventListener("click", clearTasks);
+clearAllBtn.addEventListener("click", clearTasks);
