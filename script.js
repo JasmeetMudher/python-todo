@@ -19,10 +19,33 @@ function addTask() {
 
   let li = document.createElement("li");
 
-  li.innerText =`Task: ${taskValue}\n` +
-                `Priority: ${priorityValue}\n` +
-                `Task Type: ${taskTypeValue}\n` +
-                `Deadline: ${deadlineValue || "No deadline"}`;
+  li.innerText =
+    `Task: ${taskValue}\n` +
+    `Priority: ${priorityValue}\n` +
+    `Task Type: ${taskTypeValue}\n` +
+    `Deadline: ${deadlineValue || "No deadline"}\n`;
+
+  const doneLabel = document.createElement("span");
+  doneLabel.innerText = "Mark as Done: ";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.addEventListener("change", () => {
+    if (checkbox.checked) {
+      li.style.textDecoration = "line-through";
+    } else {
+      li.style.textDecoration = "none";
+    }
+  });
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.innerText = "Delete";
+  deleteBtn.className = "delete-btn";
+  deleteBtn.addEventListener("click", () => li.remove());
+
+  li.appendChild(doneLabel);
+  li.appendChild(checkbox);
+  li.appendChild(deleteBtn);
 
   taskListOl.appendChild(li);
 
