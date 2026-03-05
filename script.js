@@ -8,25 +8,28 @@ const deadlineInput = document.getElementById("deadline");
 const prioritySelect = document.getElementById("priority");
 const taskTypeSelect = document.getElementById("task-type");
 
+const USER_ID = "1";
 
 const displayTasks = async () => {
-  const response = await fetch(API_URL);
+  const response = await fetch(`${API_URL}/${USER_ID}`);
   const tasks = await response.json();
 
   taskListOl.innerHTML = "";
 
-  tasks.forEach((todo, index) => {
+  tasks.forEach((todo) => {
     const li = document.createElement("li");
-    li.innerText = 
+
+    li.innerText =
       `Task: ${todo.task}\n` +
       `Priority: ${todo.priority}\n` +
       `Type: ${todo.task_type}\n` +
-      `Deadline: ${todo.deadline}\n`;
+      `Deadline: ${todo.deadline || "None"}\n`;
 
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "Delete";
     deleteBtn.className = "delete-btn";
-    deleteBtn.onclick = () => deleteTask(index);
+
+    deleteBtn.onclick = () => deleteTask(todo.id);
 
     li.appendChild(deleteBtn);
     taskListOl.appendChild(li);
@@ -35,40 +38,55 @@ const displayTasks = async () => {
 
 const addTask = async () => {
   const taskValue = taskInput.value.trim();
-  if (taskValue === "") {
-    alert("Please Enter a Task");
-    return;
-  }
+  if (!taskValue) return alert("Please Enter a Task");
 
   const todoData = {
+    user_id: USER_ID,
     task: taskValue,
     priority: prioritySelect.value,
     task_type: taskTypeSelect.value,
-    deadline: deadlineInput.value || "No deadline"
+    deadline: deadlineInput.value || null,
   };
 
-  await fetch(API_URL, {
+  const response = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(todoData)
+    body: JSON.stringify(todoData),
   });
 
-  taskInput.value = "";
-  displayTasks();
+  if (response.ok) {
+    taskInput.value = "";
+    displayTasks();
+  } else {
+    const error = await response.json();
+    alert(`Error: ${error.detail}`);
+  }
 };
 
-const deleteTask = async (index) => {
-  await fetch(`${API_URL}/${index}`, {
-    method: "DELETE"
+const deleteTask = async (taskId) => {
+  await fetch(`${API_URL}/${taskId}`, {
+    method: "DELETE",
   });
-  displayTasksTasks();
+    if (response.ok) {
+    displayTasks();
+  } else {
+    const error = await response.json();
+    alert(`Error: ${error.detail}`);
+  }
 };
 
 const clearTasks = async () => {
-  await fetch(API_URL, { method: "DELETE" });
-  displayTasks();
+  const response = await fetch(`${API_URL}/user/${USER_ID}`, {
+    method: "DELETE",
+  });
+  if (response.ok) {
+    displayTasks();
+  } else {
+    const error = await response.json();
+    alert(`Error: ${error.detail}`);
+  }
 };
 
 addBtn.addEventListener("click", addTask);
 clearAllBtn.addEventListener("click", clearTasks);
-window.onload = displayTasks;
+displayTasks();
