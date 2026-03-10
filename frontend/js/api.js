@@ -31,7 +31,7 @@ export default class API {
     });
     if (!res.ok) throw new Error("Failed to clear tasks");
   }
-  
+
   async toggleTask(taskId) {
     const res = await fetch(`${this.baseURL}/${taskId}`, {
       method: "PATCH",
@@ -39,4 +39,15 @@ export default class API {
 
     if (!res.ok) throw new Error("Failed to toggle task");
   }
+
+  async updateTask(taskId, taskData) {
+  const res = await fetch(`${this.baseURL}/${taskId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(taskData)
+  });
+
+  if (!res.ok) throw new Error("Failed to update task");
+  return res.json();
+}
 }

@@ -27,11 +27,18 @@ export default class UI {
 
   async displayTasks() {
     const tasks = await this.api.getTasks(this.user.getId());
+    const priorityOrder = { High: 1, Medium: 2, Low: 3 };
+    tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 
     this.taskList.innerHTML = "";
 
     tasks.forEach((todo) => {
       const li = document.createElement("li");
+      const today = new Date();
+
+      if (todo.deadline && new Date(todo.deadline) < today && !todo.completed) {
+        li.style.backgroundColor = "#ffcccc";
+      }
 
       const text = document.createElement("span");
 
@@ -63,6 +70,14 @@ export default class UI {
       deleteBtn.addEventListener("click", () => this.deleteTask(todo.id));
 
       li.appendChild(deleteBtn);
+
+      const editBtn = document.createElement("button");
+      editBtn.innerText = "Edit";
+      editBtn.className = "edit-btn";
+
+      editBtn.addEventListener("click", () => this.editTask(todo));
+
+      li.appendChild(editBtn);
 
       this.taskList.appendChild(li);
     });
@@ -101,6 +116,21 @@ export default class UI {
 
   async toggleTask(taskId) {
     await this.api.toggleTask(taskId);
+    this.displayTasks();
+  }
+
+  async editTask(todo) {
+    const newTask = prompt("Edit task:", todo.task);
+    if (!newTask) return;
+    todo.task = newTask;
+    await this.api.updateTask(todo.id, {
+      task: todo.task,
+      priority: todo.priority,
+      task_type: todo.task_type,
+      deadline: todo.deadline,
+      completed: todo.completed,
+    });
+
     this.displayTasks();
   }
 }
