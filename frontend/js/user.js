@@ -1,8 +1,16 @@
-export default class User{
-    constructor(user_id){
-        this.user_id = user_id;
-    }
-    getId() {
-        return this.user_id
-    }
+export default class User {
+  constructor(id, firstName, lastName, email = null) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  getFullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
 }

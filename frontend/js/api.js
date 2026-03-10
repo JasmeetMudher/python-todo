@@ -31,4 +31,12 @@ export default class API {
     });
     if (!res.ok) throw new Error("Failed to clear tasks");
   }
+  
+  async toggleTask(taskId) {
+    const res = await fetch(`${this.baseURL}/${taskId}`, {
+      method: "PATCH",
+    });
+
+    if (!res.ok) throw new Error("Failed to toggle task");
+  }
 }

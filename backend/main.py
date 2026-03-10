@@ -48,3 +48,18 @@ def clear_all(user_id: str, session: Session = Depends(get_session)):
         session.delete(task)
     session.commit()
     return {"message": "Cleared"}
+
+@app.patch("/tasks/{task_id}")
+def toggle_task(task_id: str, session: Session = Depends(get_session)):
+    task = session.get(Todo, task_id)
+
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task.completed = not task.completed
+
+    session.add(task)
+    session.commit()
+    session.refresh(task)
+
+    return task

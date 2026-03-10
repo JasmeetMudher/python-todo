@@ -33,22 +33,37 @@ export default class UI {
     tasks.forEach((todo) => {
       const li = document.createElement("li");
 
-      li.innerHTML = `
-        Task: ${todo.task}<br>
-        Priority: ${todo.priority}<br>
-        Type: ${todo.task_type}<br>
-        Deadline: ${todo.deadline || "None"}<br>
-      `;
+      const text = document.createElement("span");
+
+      text.innerHTML = `
+    Task: ${todo.task}<br>
+    Priority: ${todo.priority}<br>
+    Type: ${todo.task_type}<br>
+    Deadline: ${todo.deadline || "None"}<br>
+  `;
+
+      if (todo.completed) {
+        text.style.textDecoration = "line-through";
+      }
+
+      li.appendChild(text);
 
       const deleteBtn = document.createElement("button");
       deleteBtn.innerText = "Delete";
       deleteBtn.className = "delete-btn";
 
-      deleteBtn.addEventListener("click", () =>
-        this.deleteTask(todo.id)
-      );
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = todo.completed;
+
+      checkbox.addEventListener("change", () => this.toggleTask(todo.id));
+
+      li.appendChild(checkbox);
+
+      deleteBtn.addEventListener("click", () => this.deleteTask(todo.id));
 
       li.appendChild(deleteBtn);
+
       this.taskList.appendChild(li);
     });
   }
@@ -66,11 +81,10 @@ export default class UI {
       taskValue,
       this.prioritySelect.value,
       this.taskTypeSelect.value,
-      this.deadlineInput.value || null
+      this.deadlineInput.value || null,
     );
 
-    await this.api.addTask(task);
-
+    await this.api.addTask(task.toAPI());
     this.taskInput.value = "";
     this.displayTasks();
   }
@@ -82,6 +96,11 @@ export default class UI {
 
   async clearTasks() {
     await this.api.clearTasks(this.user.getId());
+    this.displayTasks();
+  }
+
+  async toggleTask(taskId) {
+    await this.api.toggleTask(taskId);
     this.displayTasks();
   }
 }
