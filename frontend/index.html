@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="app-header">
+        <h1>My Todo App</h1>
+      </header>
+
+      <section class="input-section">
+        <input placeholder="Enter a Task" id="task" />
+
+        <p>Select Priority</p>
+        <select id="priority">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <p>Select Task type:</p>
+        <select id="task-type">
+          <option>Personal</option>
+          <option>School</option>
+          <option>Work</option></select
+        ><br />
+
+        <p>Select Deadline:</p>
+        <input type="date" id="deadline" />
+
+        <button id="add-btn">Add</button>
+      </section>
+
+      <section class="list-section">
+        <p>Your Tasks:</p>
+        <ol id="task-list"></ol>
+      </section>
+
+      <button id="clear-btn" class="clear-btn">Clear All</button>
+
+      <footer>
+        <p>Made by Jasmeet</p>
+      </footer>
+    </div>
+
+<script type="module" src="js/main.js"></script>  </body>
+</html>
