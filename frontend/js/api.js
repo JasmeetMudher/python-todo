@@ -31,4 +31,16 @@ export default class API {
     });
     if (!res.ok) throw new Error("Failed to clear tasks");
   }
+
+
+async updateTask(taskId, taskData) {
+  const res = await fetch(`${this.baseURL}/${taskId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(taskData)
+  });
+
+  if (!res.ok) throw new Error("Failed to update task");
+  return res.json();
+}
 }

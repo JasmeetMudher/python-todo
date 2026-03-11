@@ -27,28 +27,70 @@ export default class UI {
 
   async displayTasks() {
     const tasks = await this.api.getTasks(this.user.getId());
+    const priorityOrder = { high: 1, medium: 2, low: 3 };
+    tasks.sort(
+      (a, b) =>
+        priorityOrder[a.priority.toLowerCase()] -
+        priorityOrder[b.priority.toLowerCase()],
+    );
 
     this.taskList.innerHTML = "";
 
     tasks.forEach((todo) => {
       const li = document.createElement("li");
+      const today = new Date();
 
-      li.innerHTML = `
-        Task: ${todo.task}<br>
-        Priority: ${todo.priority}<br>
-        Type: ${todo.task_type}<br>
-        Deadline: ${todo.deadline || "None"}<br>
-      `;
+      if (todo.deadline && new Date(todo.deadline) < today && !todo.completed) {
+        li.classList.add("overdue");
+      } else {
+        li.classList.remove("overdue");
+      }
+
+      const text = document.createElement("span");
+
+      text.innerHTML = `
+    Task: ${todo.task}<br>
+    Priority: ${todo.priority}<br>
+    Type: ${todo.task_type}<br>
+    Deadline: ${todo.deadline || "None"}<br>
+  `;
+
+      if (todo.completed) {
+        text.style.textDecoration = "line-through";
+      }
+
+      li.appendChild(text);
 
       const deleteBtn = document.createElement("button");
       deleteBtn.innerText = "Delete";
       deleteBtn.className = "delete-btn";
 
-      deleteBtn.addEventListener("click", () =>
-        this.deleteTask(todo.id)
-      );
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = todo.completed;
+
+      checkbox.addEventListener("change", async () => {
+        todo.completed = checkbox.checked;
+
+        await this.api.updateTask(todo.id, todo);
+
+        this.displayTasks();
+      });
+
+      li.appendChild(checkbox);
+
+      deleteBtn.addEventListener("click", () => this.deleteTask(todo.id));
 
       li.appendChild(deleteBtn);
+
+      const editBtn = document.createElement("button");
+      editBtn.innerText = "Edit";
+      editBtn.className = "edit-btn";
+
+      editBtn.addEventListener("click", () => this.editTask(todo));
+
+      li.appendChild(editBtn);
+
       this.taskList.appendChild(li);
     });
   }
@@ -66,11 +108,10 @@ export default class UI {
       taskValue,
       this.prioritySelect.value,
       this.taskTypeSelect.value,
-      this.deadlineInput.value || null
+      this.deadlineInput.value || null,
     );
 
-    await this.api.addTask(task);
-
+    await this.api.addTask(task.toAPI());
     this.taskInput.value = "";
     this.displayTasks();
   }
@@ -82,6 +123,21 @@ export default class UI {
 
   async clearTasks() {
     await this.api.clearTasks(this.user.getId());
+    this.displayTasks();
+  }
+
+  async editTask(todo) {
+    const newTask = prompt("Edit task:", todo.task);
+    if (!newTask) return;
+    todo.task = newTask;
+    await this.api.updateTask(todo.id, {
+      task: todo.task,
+      priority: todo.priority,
+      task_type: todo.task_type,
+      deadline: todo.deadline,
+      completed: todo.completed,
+    });
+
     this.displayTasks();
   }
 }

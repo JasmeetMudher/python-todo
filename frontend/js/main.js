@@ -4,7 +4,12 @@ import User from "./user.js";
 
 const API_URL = "http://127.0.0.1:8000/tasks";
 
-const user = new User("1");
+const user = new User(
+  "1",
+  "Jasmeet",
+  "Singh",
+  "test@gmail.com"
+);
 const api = new API(API_URL);
 
 new UI(api, user);

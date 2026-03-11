@@ -87,3 +87,6 @@ input[type="checkbox"] {
 .delete-btn{
   background-color: red;
 }
+.overdue {
+  background-color: #ffcccc;
+}
