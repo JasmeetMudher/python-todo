@@ -32,17 +32,10 @@ export default class API {
     if (!res.ok) throw new Error("Failed to clear tasks");
   }
 
-  async toggleTask(taskId) {
-    const res = await fetch(`${this.baseURL}/${taskId}`, {
-      method: "PATCH",
-    });
 
-    if (!res.ok) throw new Error("Failed to toggle task");
-  }
-
-  async updateTask(taskId, taskData) {
+async updateTask(taskId, taskData) {
   const res = await fetch(`${this.baseURL}/${taskId}`, {
-    method: "PUT",
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(taskData)
   });

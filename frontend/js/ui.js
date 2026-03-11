@@ -27,8 +27,12 @@ export default class UI {
 
   async displayTasks() {
     const tasks = await this.api.getTasks(this.user.getId());
-    const priorityOrder = { High: 1, Medium: 2, Low: 3 };
-    tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    const priorityOrder = { high: 1, medium: 2, low: 3 };
+    tasks.sort(
+      (a, b) =>
+        priorityOrder[a.priority.toLowerCase()] -
+        priorityOrder[b.priority.toLowerCase()],
+    );
 
     this.taskList.innerHTML = "";
 
@@ -37,7 +41,9 @@ export default class UI {
       const today = new Date();
 
       if (todo.deadline && new Date(todo.deadline) < today && !todo.completed) {
-        li.style.backgroundColor = "#ffcccc";
+        li.classList.add("overdue");
+      } else {
+        li.classList.remove("overdue");
       }
 
       const text = document.createElement("span");
@@ -63,7 +69,13 @@ export default class UI {
       checkbox.type = "checkbox";
       checkbox.checked = todo.completed;
 
-      checkbox.addEventListener("change", () => this.toggleTask(todo.id));
+      checkbox.addEventListener("change", async () => {
+        todo.completed = checkbox.checked;
+
+        await this.api.updateTask(todo.id, todo);
+
+        this.displayTasks();
+      });
 
       li.appendChild(checkbox);
 
@@ -111,11 +123,6 @@ export default class UI {
 
   async clearTasks() {
     await this.api.clearTasks(this.user.getId());
-    this.displayTasks();
-  }
-
-  async toggleTask(taskId) {
-    await this.api.toggleTask(taskId);
     this.displayTasks();
   }
 
