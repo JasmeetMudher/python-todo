@@ -4,6 +4,8 @@ from typing import List
 from models import Todo
 from database import init_db, get_session
 from datetime import datetime
+from fastapi import Body
+from models import User
 
 
 app = FastAPI()
@@ -68,3 +70,21 @@ def update_task(task_id: str, updated_task: Todo, session: Session = Depends(get
     session.refresh(task)
 
     return task
+
+@app.post("/register")
+def register_user(username: str = Body(...), password: str = Body(...), session: Session = Depends(get_session)):
+    existing = session.exec(select(User).where(User.username == username)).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    user = User(username=username, password=password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+
+@app.post("/login")
+def login_user(username: str = Body(...), password: str = Body(...), session: Session = Depends(get_session)):
+    user = session.exec(select(User).where(User.username == username)).first()
+    if not user or user.password != password:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return user

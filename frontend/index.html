@@ -7,9 +7,18 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <div class="container">
+    <div id="login-container">
+      <h2>Login</h2>
+      <input id="username" placeholder="Username" />
+      <input id="password" placeholder="Password" type="password" />
+      <button id="login-btn">Login</button>
+      <button id="register-btn">Register</button>
+    </div>
+    
+    <div class="container" id="todo-container">
       <header class="app-header">
         <h1>My Todo App</h1>
+        <button id="logout-btn">Logout</button>
       </header>
 
       <section class="input-section">
@@ -47,5 +56,6 @@
       </footer>
     </div>
 
-<script type="module" src="js/main.js"></script>  </body>
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>

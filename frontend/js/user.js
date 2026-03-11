@@ -1,16 +1,32 @@
 export default class User {
-  constructor(id, firstName, lastName, email = null) {
+  constructor() {
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+    if (savedUser) {
+      this.id = savedUser.id;
+      this.username = savedUser.username;
+    } else {
+      this.id = null;
+      this.username = null;
+    }
+  }
+
+  setUser(id, username) {
     this.id = id;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
+    this.username = username;
+    localStorage.setItem("user", JSON.stringify({ id, username }));
   }
 
   getId() {
     return this.id;
   }
 
-  getFullName() {
-    return `${this.firstName} ${this.lastName}`;
+  isLoggedIn() {
+    return !!this.id;
+  }
+
+  logout() {
+    this.id = null;
+    this.username = null;
+    localStorage.removeItem("user");
   }
 }
