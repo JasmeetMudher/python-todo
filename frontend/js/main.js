@@ -2,14 +2,9 @@ import API from "./api.js";
 import UI from "./ui.js";
 import User from "./user.js";
 
-const API_URL = "http://127.0.0.1:8000/tasks";
+const API_URL = "http://127.0.0.1:8000";
 
-const user = new User(
-  "1",
-  "Jasmeet",
-  "Singh",
-  "test@gmail.com"
-);
+const user = new User();
 const api = new API(API_URL);
 
 new UI(api, user);

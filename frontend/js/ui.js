@@ -21,6 +21,18 @@ export default class UI {
   init() {
     this.addBtn.addEventListener("click", () => this.addTask());
     this.clearBtn.addEventListener("click", () => this.clearTasks());
+    document
+      .getElementById("login-btn")
+      .addEventListener("click", () => this.handleLogin());
+    document
+      .getElementById("register-btn")
+      .addEventListener("click", () => this.handleRegister());
+
+    if (this.user.isLoggedIn()) {
+      document.getElementById("login-container").style.display = "none";
+      document.getElementById("todo-container").style.display = "block";
+      this.displayTasks();
+    }
 
     this.displayTasks();
   }
@@ -92,6 +104,12 @@ export default class UI {
       li.appendChild(editBtn);
 
       this.taskList.appendChild(li);
+
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        this.user.logout();
+        document.getElementById("login-container").style.display = "block";
+        document.getElementById("todo-container").style.display = "none";
+      });
     });
   }
 
@@ -139,5 +157,36 @@ export default class UI {
     });
 
     this.displayTasks();
+  }
+
+  async handleLogin() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    if (!username || !password) return alert("Enter credentials");
+
+    try {
+      const userData = await this.api.login(username, password);
+      this.user.setUser(userData.id, userData.username);
+
+      document.getElementById("login-container").style.display = "none";
+      document.getElementById("todo-container").style.display = "block";
+
+      this.displayTasks();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async handleRegister() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    if (!username || !password) return alert("Enter credentials");
+
+    try {
+      const userData = await this.api.register(username, password);
+      alert("Registration successful! You can now login.");
+    } catch (err) {
+      alert(err.message);
+    }
   }
 }
