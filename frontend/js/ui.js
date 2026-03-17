@@ -38,7 +38,7 @@ export default class UI {
   }
 
   async displayTasks() {
-    const tasks = await this.api.getTasks(this.user.getId());
+    const tasks = await this.api.getTasks();
     const priorityOrder = { high: 1, medium: 2, low: 3 };
     tasks.sort(
       (a, b) =>
@@ -105,11 +105,13 @@ export default class UI {
 
       this.taskList.appendChild(li);
 
-      document.getElementById("logout-btn").addEventListener("click", () => {
-        this.user.logout();
-        document.getElementById("login-container").style.display = "block";
-        document.getElementById("todo-container").style.display = "none";
-      });
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", async () => {
+          await this.user.logout(this.api);
+          document.getElementById("login-container").style.display = "block";
+          document.getElementById("todo-container").style.display = "none";
+        });
     });
   }
 

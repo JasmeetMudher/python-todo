@@ -3,14 +3,18 @@ export default class API {
     this.baseURL = baseURL;
   }
 
-  async getTasks(userId) {
-    const res = await fetch(`${this.baseURL}/tasks/${userId}`);
+  async getTasks() {
+    const res = await fetch(`${this.baseURL}/tasks`, {
+      credentials: "include",
+    });
+
     return res.json();
   }
 
   async addTask(task) {
     const res = await fetch(`${this.baseURL}/tasks`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(task),
     });
@@ -20,6 +24,7 @@ export default class API {
   async deleteTask(taskId) {
     const res = await fetch(`${this.baseURL}/tasks/${taskId}`, {
       method: "DELETE",
+      credentials: "include", 
     });
 
     if (!res.ok) throw new Error("Failed to delete task");
@@ -28,39 +33,55 @@ export default class API {
   async clearTasks(userId) {
     const res = await fetch(`${this.baseURL}/tasks/user/${userId}`, {
       method: "DELETE",
+      credentials: "include", 
     });
+
     if (!res.ok) throw new Error("Failed to clear tasks");
   }
 
+  async updateTask(taskId, taskData) {
+    const res = await fetch(`${this.baseURL}/tasks/${taskId}`, {
+      method: "PATCH",
+      credentials: "include", 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(taskData),
+    });
 
-async updateTask(taskId, taskData) {
-  const res = await fetch(`${this.baseURL}/tasks/${taskId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(taskData)
-  });
+    if (!res.ok) throw new Error("Failed to update task");
+    return res.json();
+  }
 
-  if (!res.ok) throw new Error("Failed to update task");
-  return res.json();
-}
+  async register(username, password) {
+    const res = await fetch(`${this.baseURL}/register`, {
+      method: "POST",
+      credentials: "include", 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-async register(username, password) {
-  const res = await fetch(`${this.baseURL}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  });
-  if (!res.ok) throw new Error("Registration failed");
-  return res.json();
-}
+    if (!res.ok) throw new Error("Registration failed");
+    return res.json();
+  }
 
-async login(username, password) {
-  const res = await fetch(`${this.baseURL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
-  });
-  if (!res.ok) throw new Error("Login failed");
-  return res.json();
-}
+  async login(username, password) {
+    const res = await fetch(`${this.baseURL}/login`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (!res.ok) throw new Error("Login failed");
+
+    return res.json();
+  }
+  async logout() {
+    const res = await fetch(`${this.baseURL}/logout`, {
+      method: "POST",
+      credentials: "include", 
+    });
+
+    if (!res.ok) throw new Error("Logout failed");
+    return res.json();
+  }
 }
