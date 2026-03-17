@@ -24,7 +24,14 @@ export default class User {
     return !!this.id;
   }
 
-  logout() {
+  async logout(api) {
+    if (api) {
+      try {
+        await api.logout();
+      } catch (err) {
+        console.error("Failed to logout:", err);
+      }
+    }
     this.id = null;
     this.username = null;
     localStorage.removeItem("user");
