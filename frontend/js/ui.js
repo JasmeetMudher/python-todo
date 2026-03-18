@@ -5,43 +5,26 @@ export default class UI {
     this.api = api;
     this.user = user;
 
-    this.taskInput = document.getElementById("task");
-    this.deadlineInput = document.getElementById("deadline");
-    this.prioritySelect = document.getElementById("priority");
-    this.taskTypeSelect = document.getElementById("task-type");
-
-    this.taskList = document.getElementById("task-list");
-
-    this.addBtn = document.getElementById("add-btn");
-    this.clearBtn = document.getElementById("clear-btn");
+    this.loginForm = document.getElementById("login-form");
+    this.todoApp = document.getElementById("todo-app");
 
     this.init();
   }
 
   init() {
-    this.addBtn.addEventListener("click", () => this.addTask());
-    this.clearBtn.addEventListener("click", () => this.clearTasks());
-    document
-      .getElementById("login-btn")
-      .addEventListener("click", () => this.handleLogin());
-    document
-      .getElementById("register-btn")
-      .addEventListener("click", () => this.handleRegister());
-
-    document
-      .getElementById("logout-btn")
-      .addEventListener("click", async () => {
-        await this.user.logout(this.api);
-        document.getElementById("login-container").style.display = "block";
-        document.getElementById("todo-container").style.display = "none";
-      });
+    this.loginForm.addEventListener("login", (e) => this.handleLogin(e.detail));
+    this.loginForm.addEventListener("register", (e) =>
+      this.handleRegister(e.detail),
+    );
+    this.todoApp.addEventListener("logout", () => this.handleLogout());
+    this.todoApp.addEventListener("clear-all", () => this.clearTasks());
+    this.todoApp.addEventListener("add-task", (e) => this.addTask(e.detail));
 
     if (this.user.isLoggedIn()) {
-      document.getElementById("login-container").style.display = "none";
-      document.getElementById("todo-container").style.display = "block";
+      this.loginForm.style.display = "none";
+      this.todoApp.show();
       this.displayTasks();
     }
-
   }
 
   async displayTasks() {
@@ -53,7 +36,8 @@ export default class UI {
         priorityOrder[b.priority.toLowerCase()],
     );
 
-    this.taskList.innerHTML = "";
+    const taskList = this.todoApp.getTaskList();
+    taskList.innerHTML = "";
 
     tasks.forEach((todo) => {
       const li = document.createElement("li");
@@ -61,18 +45,15 @@ export default class UI {
 
       if (todo.deadline && new Date(todo.deadline) < today && !todo.completed) {
         li.classList.add("overdue");
-      } else {
-        li.classList.remove("overdue");
       }
 
       const text = document.createElement("span");
-
       text.innerHTML = `
-    Task: ${todo.task}<br>
-    Priority: ${todo.priority}<br>
-    Type: ${todo.task_type}<br>
-    Deadline: ${todo.deadline || "None"}<br>
-  `;
+        Task: ${todo.task}<br>
+        Priority: ${todo.priority}<br>
+        Type: ${todo.task_type}<br>
+        Deadline: ${todo.deadline || "None"}<br>
+      `;
 
       if (todo.completed) {
         text.style.textDecoration = "line-through";
@@ -80,63 +61,51 @@ export default class UI {
 
       li.appendChild(text);
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.innerText = "Delete";
-      deleteBtn.className = "delete-btn";
-
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = todo.completed;
-
       checkbox.addEventListener("change", async () => {
         todo.completed = checkbox.checked;
-
         await this.api.updateTask(todo.id, todo);
+        this.displayTasks();
+      });
 
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerText = "Delete";
+      deleteBtn.className = "delete-btn";
+      deleteBtn.addEventListener("click", async () => {
+        await this.api.deleteTask(todo.id);
+        this.displayTasks();
+      });
+
+      const editBtn = document.createElement("button");
+      editBtn.innerText = "Edit";
+      editBtn.addEventListener("click", async () => {
+        const newTask = prompt("Edit task:", todo.task);
+        if (!newTask) return;
+        todo.task = newTask;
+        await this.api.updateTask(todo.id, {
+          task: todo.task,
+          priority: todo.priority,
+          task_type: todo.task_type,
+          deadline: todo.deadline,
+          completed: todo.completed,
+        });
         this.displayTasks();
       });
 
       li.appendChild(checkbox);
-
-      deleteBtn.addEventListener("click", () => this.deleteTask(todo.id));
-
       li.appendChild(deleteBtn);
-
-      const editBtn = document.createElement("button");
-      editBtn.innerText = "Edit";
-      editBtn.className = "edit-btn";
-
-      editBtn.addEventListener("click", () => this.editTask(todo));
-
       li.appendChild(editBtn);
 
-      this.taskList.appendChild(li);
+      taskList.appendChild(li);
     });
   }
 
-  async addTask() {
-    const taskValue = this.taskInput.value.trim();
+  async addTask({ task, priority, taskType, deadline }) {
+    const taskObj = new Task(null, task, priority, taskType, deadline);
 
-    if (!taskValue) {
-      alert("Enter a task");
-      return;
-    }
-
-    const task = new Task(
-      null,
-      taskValue,
-      this.prioritySelect.value,
-      this.taskTypeSelect.value,
-      this.deadlineInput.value || null,
-    );
-
-    await this.api.addTask(task.toAPI());
-    this.taskInput.value = "";
-    this.displayTasks();
-  }
-
-  async deleteTask(taskId) {
-    await this.api.deleteTask(taskId);
+    await this.api.addTask(taskObj.toAPI());
     this.displayTasks();
   }
 
@@ -145,32 +114,15 @@ export default class UI {
     this.displayTasks();
   }
 
-  async editTask(todo) {
-    const newTask = prompt("Edit task:", todo.task);
-    if (!newTask) return;
-    todo.task = newTask;
-    await this.api.updateTask(todo.id, {
-      task: todo.task,
-      priority: todo.priority,
-      task_type: todo.task_type,
-      deadline: todo.deadline,
-      completed: todo.completed,
-    });
-
-    this.displayTasks();
-  }
-
-  async handleLogin() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+  async handleLogin({ username, password }) {
     if (!username || !password) return alert("Enter credentials");
 
     try {
       const userData = await this.api.login(username, password);
       this.user.setUser(userData.id, userData.username);
 
-      document.getElementById("login-container").style.display = "none";
-      document.getElementById("todo-container").style.display = "block";
+      this.loginForm.style.display = "none";
+      this.todoApp.show();
 
       this.displayTasks();
     } catch (err) {
@@ -178,9 +130,7 @@ export default class UI {
     }
   }
 
-  async handleRegister() {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+  async handleRegister({ username, password }) {
     if (!username || !password) return alert("Enter credentials");
 
     try {
@@ -189,5 +139,12 @@ export default class UI {
     } catch (err) {
       alert(err.message);
     }
+  }
+
+  async handleLogout() {
+    await this.user.logout(this.api);
+    this.loginForm.style.display = "block";
+    this.loginForm.clear();
+    this.todoApp.hide();
   }
 }

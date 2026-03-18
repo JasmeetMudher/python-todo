@@ -1,6 +1,8 @@
 import API from "./api.js";
 import UI from "./ui.js";
 import User from "./user.js";
+import "./components/LoginForm.js";
+import "./components/TodoApp.js";
 
 const API_URL = "http://127.0.0.1:8000";
 
