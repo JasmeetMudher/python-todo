@@ -14,11 +14,19 @@ from fastapi import Request
 app = FastAPI()
 init_db()
 
-app.add_middleware(SessionMiddleware, secret_key="super-secret-key")
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="super-secret-key",
+    same_site="lax",    
+    https_only=False     
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],
+    allow_origins=[
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,6 +64,18 @@ def add_todo(request: Request, todo: Todo, session: Session = Depends(get_sessio
     return todo
 
 
+@app.delete("/tasks/user")
+def clear_all(request: Request, session: Session = Depends(get_session)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Not logged in")
+    tasks = session.exec(select(Todo).where(Todo.user_id == user_id)).all()
+    for task in tasks:
+        session.delete(task)
+    session.commit()
+    return {"message": "Cleared"}
+
+
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: str, session: Session = Depends(get_session)):
     task = session.get(Todo, task_id)
@@ -64,15 +84,6 @@ def delete_task(task_id: str, session: Session = Depends(get_session)):
     session.delete(task)
     session.commit()
     return {"message": "Deleted"}
-
-
-@app.delete("/tasks/user/{user_id}")
-def clear_all(user_id: str, session: Session = Depends(get_session)):
-    tasks = session.exec(select(Todo).where(Todo.user_id == user_id)).all()
-    for task in tasks:
-        session.delete(task)
-    session.commit()
-    return {"message": "Cleared"}
 
 
 @app.patch("/tasks/{task_id}")
@@ -132,8 +143,8 @@ def login_user(
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     request.session["user_id"] = user.id
-
-    return {"message": "Logged in"}
+    
+    return {"message": "Logged in", "id": user.id, "username": user.username}
 
 
 @app.post("/logout")

@@ -4,12 +4,16 @@ export default class API {
   }
 
   async getTasks() {
-    const res = await fetch(`${this.baseURL}/tasks`, {
-      credentials: "include",
-    });
+  const res = await fetch(`${this.baseURL}/tasks`, {
+    credentials: "include",
+  });
 
-    return res.json();
+  if (!res.ok) {
+    throw new Error("Not logged in");
   }
+
+  return res.json();
+}
 
   async addTask(task) {
     const res = await fetch(`${this.baseURL}/tasks`, {
@@ -30,14 +34,14 @@ export default class API {
     if (!res.ok) throw new Error("Failed to delete task");
   }
 
-  async clearTasks(userId) {
-    const res = await fetch(`${this.baseURL}/tasks/user/${userId}`, {
-      method: "DELETE",
-      credentials: "include", 
-    });
+  async clearTasks() {
+  const res = await fetch(`${this.baseURL}/tasks/user`, {
+    method: "DELETE",
+    credentials: "include",
+  });
 
-    if (!res.ok) throw new Error("Failed to clear tasks");
-  }
+  if (!res.ok) throw new Error("Failed to clear tasks");
+}
 
   async updateTask(taskId, taskData) {
     const res = await fetch(`${this.baseURL}/tasks/${taskId}`, {

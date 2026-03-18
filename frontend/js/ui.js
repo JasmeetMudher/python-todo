@@ -28,13 +28,20 @@ export default class UI {
       .getElementById("register-btn")
       .addEventListener("click", () => this.handleRegister());
 
+    document
+      .getElementById("logout-btn")
+      .addEventListener("click", async () => {
+        await this.user.logout(this.api);
+        document.getElementById("login-container").style.display = "block";
+        document.getElementById("todo-container").style.display = "none";
+      });
+
     if (this.user.isLoggedIn()) {
       document.getElementById("login-container").style.display = "none";
       document.getElementById("todo-container").style.display = "block";
       this.displayTasks();
     }
 
-    this.displayTasks();
   }
 
   async displayTasks() {
@@ -104,14 +111,6 @@ export default class UI {
       li.appendChild(editBtn);
 
       this.taskList.appendChild(li);
-
-      document
-        .getElementById("logout-btn")
-        .addEventListener("click", async () => {
-          await this.user.logout(this.api);
-          document.getElementById("login-container").style.display = "block";
-          document.getElementById("todo-container").style.display = "none";
-        });
     });
   }
 
@@ -124,7 +123,7 @@ export default class UI {
     }
 
     const task = new Task(
-      this.user.getId(),
+      null,
       taskValue,
       this.prioritySelect.value,
       this.taskTypeSelect.value,
@@ -142,7 +141,7 @@ export default class UI {
   }
 
   async clearTasks() {
-    await this.api.clearTasks(this.user.getId());
+    await this.api.clearTasks();
     this.displayTasks();
   }
 
