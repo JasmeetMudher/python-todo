@@ -39,7 +39,7 @@ export default class TaskItem extends HTMLElement {
           display: flex;
           align-items: center;
           gap: 10px;
-          background: ${isOverdue ? "#ffcccc" : "var(--task-bg, #faf3c0)"};
+          background: ${isOverdue ? "var(--overdue-bg, #ffcccc)" : "var(--task-bg, #faf3c0)"};
           padding: 8px;
           margin-bottom: 6px;
           border-radius: 10px;
@@ -48,6 +48,7 @@ export default class TaskItem extends HTMLElement {
 
         .text {
           flex: 1;
+          padding:10px;
         }
 
         .text span {

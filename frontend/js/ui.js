@@ -20,11 +20,30 @@ export default class UI {
     this.todoApp.addEventListener("clear-all", () => this.clearTasks());
     this.todoApp.addEventListener("add-task", (e) => this.addTask(e.detail));
 
+    this.todoApp.addEventListener("task-toggle", (e) => this.toggleTask(e.detail));
+    this.todoApp.addEventListener("task-delete", (e) => this.deleteTask(e.detail));
+    this.todoApp.addEventListener("task-edit", (e) => this.editTask(e.detail));
+
     if (this.user.isLoggedIn()) {
       this.loginForm.style.display = "none";
       this.todoApp.show();
       this.displayTasks();
     }
+  }
+
+  async toggleTask({ taskId, task }) {
+    await this.api.updateTask(taskId, task);
+    this.displayTasks();
+  }
+
+  async deleteTask({ taskId }) {
+    await this.api.deleteTask(taskId);
+    this.displayTasks();
+  }
+
+  async editTask({ taskId, task }) {
+    await this.api.updateTask(taskId, task);
+    this.displayTasks();
   }
 
   async displayTasks() {
@@ -37,68 +56,12 @@ export default class UI {
     );
 
     const taskList = this.todoApp.getTaskList();
-    taskList.innerHTML = "";
+    taskList.clear();
 
     tasks.forEach((todo) => {
-      const li = document.createElement("li");
-      const today = new Date();
-
-      if (todo.deadline && new Date(todo.deadline) < today && !todo.completed) {
-        li.classList.add("overdue");
-      }
-
-      const text = document.createElement("span");
-      text.innerHTML = `
-        Task: ${todo.task}<br>
-        Priority: ${todo.priority}<br>
-        Type: ${todo.task_type}<br>
-        Deadline: ${todo.deadline || "None"}<br>
-      `;
-
-      if (todo.completed) {
-        text.style.textDecoration = "line-through";
-      }
-
-      li.appendChild(text);
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = todo.completed;
-      checkbox.addEventListener("change", async () => {
-        todo.completed = checkbox.checked;
-        await this.api.updateTask(todo.id, todo);
-        this.displayTasks();
-      });
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.innerText = "Delete";
-      deleteBtn.className = "delete-btn";
-      deleteBtn.addEventListener("click", async () => {
-        await this.api.deleteTask(todo.id);
-        this.displayTasks();
-      });
-
-      const editBtn = document.createElement("button");
-      editBtn.innerText = "Edit";
-      editBtn.addEventListener("click", async () => {
-        const newTask = prompt("Edit task:", todo.task);
-        if (!newTask) return;
-        todo.task = newTask;
-        await this.api.updateTask(todo.id, {
-          task: todo.task,
-          priority: todo.priority,
-          task_type: todo.task_type,
-          deadline: todo.deadline,
-          completed: todo.completed,
-        });
-        this.displayTasks();
-      });
-
-      li.appendChild(checkbox);
-      li.appendChild(deleteBtn);
-      li.appendChild(editBtn);
-
-      taskList.appendChild(li);
+      const taskItem = document.createElement("task-item");
+      taskItem.taskData = todo;
+      taskList.addTaskItem(taskItem);
     });
   }
 
