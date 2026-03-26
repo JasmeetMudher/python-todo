@@ -15,18 +15,12 @@ app = FastAPI()
 init_db()
 
 app.add_middleware(
-    SessionMiddleware,
-    secret_key="super-secret-key",
-    same_site="lax",    
-    https_only=False     
+    SessionMiddleware, secret_key="super-secret-key", same_site="lax", https_only=False
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-    "http://127.0.0.1:5500",
-    "http://localhost:5500"
-],
+    allow_origins=["http://127.0.0.1:5500", "http://localhost:5500"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -143,7 +137,7 @@ def login_user(
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     request.session["user_id"] = user.id
-    
+
     return {"message": "Logged in", "id": user.id, "username": user.username}
 
 
