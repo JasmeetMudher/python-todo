@@ -1,0 +1,4 @@
+fastapi==0.135.2
+passlib==1.7.4
+sqlmodel==0.0.37
+starlette==1.0.0
